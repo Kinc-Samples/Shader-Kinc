@@ -20,8 +20,8 @@ namespace {
 		Graphics::clear(0);
 
 		program->set();
-		vertices->set();
-		indices->set();
+		Graphics::setVertexBuffer(*vertices);
+		Graphics::setIndexBuffer(*indices);
 		Graphics::drawIndexedVertices();
 
 		Graphics::end();
