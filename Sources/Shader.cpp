@@ -5,6 +5,9 @@
 #include <Kore/Graphics/Shader.h>
 #include <Kore/System.h>
 #include <limits>
+#include <stdlib.h>
+#include <stdio.h>
+#include <Kore/ogl.h>
 
 using namespace Kore;
 
@@ -16,8 +19,9 @@ namespace {
 	IndexBuffer* indices;
 
 	void update() {
+        printf("update\n");
 		Graphics::begin();
-		Graphics::clear(0);
+		Graphics::clear(Kore::Graphics::ClearColorFlag);
 
 		program->set();
 		Graphics::setVertexBuffer(*vertices);
