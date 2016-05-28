@@ -7,7 +7,6 @@
 #include <limits>
 #include <stdlib.h>
 #include <stdio.h>
-#include <Kore/ogl.h>
 
 using namespace Kore;
 
@@ -42,7 +41,7 @@ int kore(int argc, char** argv) {
 	options.height = 768;
 	options.x = 100;
 	options.y = 100;
-	options.targetDisplay = 0;
+	options.targetDisplay = -1;
 	options.mode = WindowMode::Window;
 	options.rendererOptions.depthBufferBits = 16;
 	options.rendererOptions.stencilBufferBits = 8;
