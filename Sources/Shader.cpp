@@ -2,6 +2,7 @@
 
 #include <Kore/IO/FileReader.h>
 #include <Kore/Graphics4/Graphics.h>
+#include <Kore/Graphics4/PipelineState.h>
 #include <Kore/Graphics4/Shader.h>
 #include <Kore/System.h>
 #include <limits>
@@ -13,16 +14,16 @@ using namespace Kore;
 namespace {
 	Graphics4::Shader* vertexShader;
 	Graphics4::Shader* fragmentShader;
-	Graphics4::Program* program;
+	Graphics4::PipelineState* pipeline;
 	Graphics4::VertexBuffer* vertices;
 	Graphics4::IndexBuffer* indices;
 
 	void update() {
-        printf("update\n");
+		printf("update\n");
 		Graphics4::begin();
 		Graphics4::clear(Graphics4::ClearColorFlag);
 
-		program->set();
+		Graphics4::setPipeline(pipeline);
 		Graphics4::setVertexBuffer(*vertices);
 		Graphics4::setIndexBuffer(*indices);
 		Graphics4::drawIndexedVertices();
@@ -33,7 +34,7 @@ namespace {
 }
 
 int kore(int argc, char** argv) {
-    Kore::System::setName("Shader");
+	Kore::System::setName("Shader");
 	Kore::System::setup();
 	Kore::WindowOptions options;
 	options.title = "Shader";
@@ -56,10 +57,12 @@ int kore(int argc, char** argv) {
 	fragmentShader = new Graphics4::Shader(fs.readAll(), fs.size(), Graphics4::FragmentShader);
 	Graphics4::VertexStructure structure;
 	structure.add("pos", Graphics4::Float3VertexData);
-	program = new Graphics4::Program;
-	program->setVertexShader(vertexShader);
-	program->setFragmentShader(fragmentShader);
-	program->link(structure);
+	pipeline = new Graphics4::PipelineState();
+	pipeline->vertexShader = vertexShader;
+	pipeline->fragmentShader = fragmentShader;
+	pipeline->inputLayout[0] = &structure;
+	pipeline->inputLayout[1] = nullptr;
+	pipeline->compile();
 
 	vertices = new Graphics4::VertexBuffer(3, structure);
 	float* v = vertices->lock();
