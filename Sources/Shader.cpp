@@ -5,9 +5,6 @@
 #include <Kore/Graphics4/PipelineState.h>
 #include <Kore/Graphics4/Shader.h>
 #include <Kore/System.h>
-#include <limits>
-#include <stdlib.h>
-#include <stdio.h>
 
 using namespace Kore;
 
@@ -19,7 +16,6 @@ namespace {
 	Graphics4::IndexBuffer* indices;
 
 	void update() {
-		printf("update\n");
 		Graphics4::begin();
 		Graphics4::clear(Graphics4::ClearColorFlag);
 
@@ -34,21 +30,7 @@ namespace {
 }
 
 int kore(int argc, char** argv) {
-	Kore::System::setName("Shader");
-	Kore::System::setup();
-	Kore::WindowOptions options;
-	options.title = "Shader";
-	options.width = 1024;
-	options.height = 768;
-	options.x = 100;
-	options.y = 100;
-	options.targetDisplay = -1;
-	options.mode = WindowMode::WindowModeWindow;
-	options.rendererOptions.depthBufferBits = 16;
-	options.rendererOptions.stencilBufferBits = 8;
-	options.rendererOptions.textureFormat = 0;
-	options.rendererOptions.antialiasing = 0;
-	Kore::System::initWindow(options);
+	Kore::System::init("Shader", 1024, 768);
 	Kore::System::setCallback(update);
 
 	FileReader vs("shader.vert");
