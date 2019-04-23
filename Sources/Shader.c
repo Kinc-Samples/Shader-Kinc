@@ -32,6 +32,17 @@ static void update() {
 	Kinc_G4_SwapBuffers();
 }
 
+static void loadShader(const char *filename, Kinc_G4_Shader *shader, Kinc_G4_ShaderType shader_type) {
+	Kinc_FileReader file;
+	Kinc_FileReader_Open(&file, filename, KINC_FILE_TYPE_ASSET);
+	uint8_t *data = &heap[heap_top];
+	size_t data_size = Kinc_FileReader_Size(&file);
+	Kinc_FileReader_Read(&file, data, data_size);
+	Kinc_FileReader_Close(&file);
+	heap_top += data_size;
+	Kinc_G4_Shader_Create(shader, data, data_size, shader_type);
+}
+
 int kore(int argc, char** argv) {
 	Kinc_Init("Shader", 1024, 768, NULL, NULL);
 	Kinc_SetUpdateCallback(update);
@@ -39,27 +50,8 @@ int kore(int argc, char** argv) {
 	heap = (uint8_t*)malloc(1024 * 1024);
 	heap_top = 0;
 	
-	{
-		Kinc_FileReader vs;
-		Kinc_FileReader_Open(&vs, "shader.vert", KINC_FILE_TYPE_ASSET);
-		uint8_t* vs_data = &heap[heap_top];
-		size_t vs_data_size = Kinc_FileReader_Size(&vs);
-		Kinc_FileReader_Read(&vs, vs_data, vs_data_size);
-		Kinc_FileReader_Close(&vs);
-		heap_top += vs_data_size;
-		Kinc_G4_Shader_Create(&vertexShader, vs_data, vs_data_size, KINC_SHADER_TYPE_VERTEX);
-	}
-
-	{
-		Kinc_FileReader fs;
-		Kinc_FileReader_Open(&fs, "shader.frag", KINC_FILE_TYPE_ASSET);
-		uint8_t* fs_data = &heap[heap_top];
-		size_t fs_data_size = Kinc_FileReader_Size(&fs);
-		Kinc_FileReader_Read(&fs, fs_data, fs_data_size);
-		Kinc_FileReader_Close(&fs);
-		heap_top += fs_data_size;
-		Kinc_G4_Shader_Create(&fragmentShader, fs_data, fs_data_size, KINC_SHADER_TYPE_FRAGMENT);
-	}
+	loadShader("shader.vert", &vertexShader, KINC_SHADER_TYPE_VERTEX);
+	loadShader("shader.frag", &fragmentShader, KINC_SHADER_TYPE_FRAGMENT);
 	
 	Kinc_G4_VertexStructure structure;
 	Kinc_G4_VertexStructure_Create(&structure);
