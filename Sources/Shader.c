@@ -8,74 +8,82 @@
 #include <Kinc/Graphics4/VertexBuffer.h>
 #include <Kinc/System.h>
 
+#include <assert.h>
 #include <stdlib.h>
 
-static Kinc_G4_Shader vertexShader;
-static Kinc_G4_Shader fragmentShader;
-static Kinc_G4_PipelineState pipeline;
-static Kinc_G4_VertexBuffer vertices;
-static Kinc_G4_IndexBuffer indices;
-static uint8_t *heap;
-static size_t heap_top;
+static kinc_g4_shader_t vertexShader;
+static kinc_g4_shader_t fragmentShader;
+static kinc_g4_pipeline_t pipeline;
+static kinc_g4_vertex_buffer_t vertices;
+static kinc_g4_index_buffer_t indices;
 
-static void update() {
-	Kinc_G4_Begin(0);
-	Kinc_G4_Clear(KINC_G4_CLEAR_COLOR, 0, 0.0f, 0);
+#define HEAP_SIZE 1024 * 1024
+static uint8_t *heap = NULL;
+static size_t heap_top = 0;
 
-	Kinc_G4_SetPipeline(&pipeline);
-	Kinc_G4_VertexBuffer *vertexBuffers[1] = { &vertices };
-	Kinc_G4_SetVertexBuffers(vertexBuffers, 1);
-	Kinc_G4_SetIndexBuffer(&indices);
-	Kinc_G4_DrawIndexedVertices();
-
-	Kinc_G4_End(0);
-	Kinc_G4_SwapBuffers();
+static void *allocate(size_t size) {
+	size_t old_top = heap_top;
+	heap_top += size;
+	assert(heap_top <= HEAP_SIZE);
+	return &heap[old_top];
 }
 
-static void loadShader(const char *filename, Kinc_G4_Shader *shader, Kinc_G4_ShaderType shader_type) {
-	Kinc_FileReader file;
-	Kinc_FileReader_Open(&file, filename, KINC_FILE_TYPE_ASSET);
-	uint8_t *data = &heap[heap_top];
-	size_t data_size = Kinc_FileReader_Size(&file);
-	Kinc_FileReader_Read(&file, data, data_size);
-	Kinc_FileReader_Close(&file);
-	heap_top += data_size;
-	Kinc_G4_Shader_Create(shader, data, data_size, shader_type);
+static void update() {
+	kinc_g4_begin(0);
+	kinc_g4_clear(KINC_G4_CLEAR_COLOR, 0, 0.0f, 0);
+
+	kinc_g4_set_pipeline(&pipeline);
+	kinc_g4_vertex_buffer_t*vertexBuffers[1] = { &vertices };
+	kinc_g4_set_vertex_buffers(vertexBuffers, 1);
+	kinc_g4_set_index_buffer(&indices);
+	kinc_g4_draw_indexed_vertices();
+
+	kinc_g4_end(0);
+	kinc_g4_swap_buffers();
+}
+
+static void loadShader(const char *filename, kinc_g4_shader_t *shader, kinc_g4_shader_type_t shader_type) {
+	kinc_file_reader_t file;
+	kinc_file_reader_open(&file, filename, KINC_FILE_TYPE_ASSET);
+	size_t data_size = kinc_file_reader_size(&file);
+	uint8_t *data = allocate(data_size);
+	kinc_file_reader_read(&file, data, data_size);
+	kinc_file_reader_close(&file);
+	kinc_g4_shader_init(shader, data, data_size, shader_type);
 }
 
 int kore(int argc, char** argv) {
-	Kinc_Init("Shader", 1024, 768, NULL, NULL);
-	Kinc_SetUpdateCallback(update);
+	kinc_init("Shader", 1024, 768, NULL, NULL);
+	kinc_set_update_callback(update);
 
-	heap = (uint8_t*)malloc(1024 * 1024);
-	heap_top = 0;
+	heap = (uint8_t*)malloc(HEAP_SIZE);
 	
 	loadShader("shader.vert", &vertexShader, KINC_SHADER_TYPE_VERTEX);
 	loadShader("shader.frag", &fragmentShader, KINC_SHADER_TYPE_FRAGMENT);
 	
-	Kinc_G4_VertexStructure structure;
-	Kinc_G4_VertexStructure_Create(&structure);
-	Kinc_G4_VertexStructure_Add(&structure, "pos", KINC_G4_VERTEX_DATA_FLOAT3);
-	Kinc_G4_PipelineState_Create(&pipeline);
-	pipeline.vertexShader = &vertexShader;
-	pipeline.fragmentShader = &fragmentShader;
-	pipeline.inputLayout[0] = &structure;
-	pipeline.inputLayout[1] = NULL;
-	Kinc_G4_PipelineState_Compile(&pipeline);
+	kinc_g4_vertex_structure_t structure;
+	kinc_g4_vertex_structure_init(&structure);
+	kinc_g4_vertex_structure_add(&structure, "pos", KINC_G4_VERTEX_DATA_FLOAT3);
+	kinc_g4_pipeline_init(&pipeline);
+	pipeline.vertex_shader = &vertexShader;
+	pipeline.fragment_shader = &fragmentShader;
+	pipeline.input_layout[0] = &structure;
+	pipeline.input_layout[1] = NULL;
+	kinc_g4_pipeline_compile(&pipeline);
 
-	Kinc_G4_VertexBuffer_Create(&vertices, 3, &structure, KINC_G4_USAGE_STATIC, 0);
-	float *v = Kinc_G4_VertexBuffer_LockAll(&vertices);
+	kinc_g4_vertex_buffer_init(&vertices, 3, &structure, KINC_G4_USAGE_STATIC, 0);
+	float *v = kinc_g4_vertex_buffer_lock_all(&vertices);
 	v[0] = -1; v[1] = -1; v[2] = 0.5;
 	v[3] = 1;  v[4] = -1; v[5] = 0.5;
 	v[6] = -1; v[7] = 1;  v[8] = 0.5;
-	Kinc_G4_VertexBuffer_UnlockAll(&vertices);
+	kinc_g4_vertex_buffer_unlock_all(&vertices);
 
-	Kinc_G4_IndexBuffer_Create(&indices, 3);
-	int *i = Kinc_G4_IndexBuffer_Lock(&indices);
+	kinc_g4_index_buffer_init(&indices, 3);
+	int *i = kinc_g4_index_buffer_lock(&indices);
 	i[0] = 0; i[1] = 1; i[2] = 2;
-	Kinc_G4_IndexBuffer_Unlock(&indices);
+	kinc_g4_index_buffer_unlock(&indices);
 
-	Kinc_Start();
+	kinc_start();
 
 	return 0;
 }
