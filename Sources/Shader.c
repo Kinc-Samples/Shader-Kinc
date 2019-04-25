@@ -3,7 +3,7 @@
 #include <Kinc/IO/FileReader.h>
 #include <Kinc/Graphics4/Graphics.h>
 #include <Kinc/Graphics4/IndexBuffer.h>
-#include <Kinc/Graphics4/PipelineState.h>
+#include <Kinc/Graphics4/Pipeline.h>
 #include <Kinc/Graphics4/Shader.h>
 #include <Kinc/Graphics4/VertexBuffer.h>
 #include <Kinc/System.h>
@@ -11,8 +11,8 @@
 #include <assert.h>
 #include <stdlib.h>
 
-static kinc_g4_shader_t vertexShader;
-static kinc_g4_shader_t fragmentShader;
+static kinc_g4_shader_t vertex_shader;
+static kinc_g4_shader_t fragment_shader;
 static kinc_g4_pipeline_t pipeline;
 static kinc_g4_vertex_buffer_t vertices;
 static kinc_g4_index_buffer_t indices;
@@ -33,8 +33,7 @@ static void update() {
 	kinc_g4_clear(KINC_G4_CLEAR_COLOR, 0, 0.0f, 0);
 
 	kinc_g4_set_pipeline(&pipeline);
-	kinc_g4_vertex_buffer_t*vertexBuffers[1] = { &vertices };
-	kinc_g4_set_vertex_buffers(vertexBuffers, 1);
+	kinc_g4_set_vertex_buffer(&vertices);
 	kinc_g4_set_index_buffer(&indices);
 	kinc_g4_draw_indexed_vertices();
 
@@ -42,7 +41,7 @@ static void update() {
 	kinc_g4_swap_buffers();
 }
 
-static void loadShader(const char *filename, kinc_g4_shader_t *shader, kinc_g4_shader_type_t shader_type) {
+static void load_shader(const char *filename, kinc_g4_shader_t *shader, kinc_g4_shader_type_t shader_type) {
 	kinc_file_reader_t file;
 	kinc_file_reader_open(&file, filename, KINC_FILE_TYPE_ASSET);
 	size_t data_size = kinc_file_reader_size(&file);
@@ -57,16 +56,17 @@ int kore(int argc, char** argv) {
 	kinc_set_update_callback(update);
 
 	heap = (uint8_t*)malloc(HEAP_SIZE);
+	assert(heap != NULL);
 	
-	loadShader("shader.vert", &vertexShader, KINC_SHADER_TYPE_VERTEX);
-	loadShader("shader.frag", &fragmentShader, KINC_SHADER_TYPE_FRAGMENT);
+	load_shader("shader.vert", &vertex_shader, KINC_SHADER_TYPE_VERTEX);
+	load_shader("shader.frag", &fragment_shader, KINC_SHADER_TYPE_FRAGMENT);
 	
 	kinc_g4_vertex_structure_t structure;
 	kinc_g4_vertex_structure_init(&structure);
 	kinc_g4_vertex_structure_add(&structure, "pos", KINC_G4_VERTEX_DATA_FLOAT3);
 	kinc_g4_pipeline_init(&pipeline);
-	pipeline.vertex_shader = &vertexShader;
-	pipeline.fragment_shader = &fragmentShader;
+	pipeline.vertex_shader = &vertex_shader;
+	pipeline.fragment_shader = &fragment_shader;
 	pipeline.input_layout[0] = &structure;
 	pipeline.input_layout[1] = NULL;
 	kinc_g4_pipeline_compile(&pipeline);
