@@ -58,8 +58,8 @@ int kore(int argc, char** argv) {
 	heap = (uint8_t*)malloc(HEAP_SIZE);
 	assert(heap != NULL);
 	
-	load_shader("shader.vert", &vertex_shader, KINC_SHADER_TYPE_VERTEX);
-	load_shader("shader.frag", &fragment_shader, KINC_SHADER_TYPE_FRAGMENT);
+	load_shader("shader.vert", &vertex_shader, KINC_G4_SHADER_TYPE_VERTEX);
+	load_shader("shader.frag", &fragment_shader, KINC_G4_SHADER_TYPE_FRAGMENT);
 	
 	kinc_g4_vertex_structure_t structure;
 	kinc_g4_vertex_structure_init(&structure);
