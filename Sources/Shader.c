@@ -1,12 +1,12 @@
 #include "pch.h"
 
-#include <Kinc/IO/FileReader.h>
-#include <Kinc/Graphics4/Graphics.h>
-#include <Kinc/Graphics4/IndexBuffer.h>
-#include <Kinc/Graphics4/Pipeline.h>
-#include <Kinc/Graphics4/Shader.h>
-#include <Kinc/Graphics4/VertexBuffer.h>
-#include <Kinc/System.h>
+#include <kinc/io/filereader.h>
+#include <kinc/graphics4/graphics.h>
+#include <kinc/graphics4/indexbuffer.h>
+#include <kinc/graphics4/pipeline.h>
+#include <kinc/graphics4/shader.h>
+#include <kinc/graphics4/vertexbuffer.h>
+#include <kinc/system.h>
 
 #include <assert.h>
 #include <stdlib.h>
@@ -57,10 +57,10 @@ int kore(int argc, char** argv) {
 
 	heap = (uint8_t*)malloc(HEAP_SIZE);
 	assert(heap != NULL);
-	
+
 	load_shader("shader.vert", &vertex_shader, KINC_G4_SHADER_TYPE_VERTEX);
 	load_shader("shader.frag", &fragment_shader, KINC_G4_SHADER_TYPE_FRAGMENT);
-	
+
 	kinc_g4_vertex_structure_t structure;
 	kinc_g4_vertex_structure_init(&structure);
 	kinc_g4_vertex_structure_add(&structure, "pos", KINC_G4_VERTEX_DATA_FLOAT3);
