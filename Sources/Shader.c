@@ -51,7 +51,7 @@ static void load_shader(const char *filename, kinc_g4_shader_t *shader, kinc_g4_
 	kinc_g4_shader_init(shader, data, data_size, shader_type);
 }
 
-int kore(int argc, char** argv) {
+int kickstart(int argc, char** argv) {
 	kinc_init("Shader", 1024, 768, NULL, NULL);
 	kinc_set_update_callback(update);
 
