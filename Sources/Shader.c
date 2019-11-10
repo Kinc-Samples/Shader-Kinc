@@ -1,11 +1,11 @@
 #include "pch.h"
 
-#include <kinc/io/filereader.h>
 #include <kinc/graphics4/graphics.h>
 #include <kinc/graphics4/indexbuffer.h>
 #include <kinc/graphics4/pipeline.h>
 #include <kinc/graphics4/shader.h>
 #include <kinc/graphics4/vertexbuffer.h>
+#include <kinc/io/filereader.h>
 #include <kinc/system.h>
 
 #include <assert.h>
@@ -51,11 +51,11 @@ static void load_shader(const char *filename, kinc_g4_shader_t *shader, kinc_g4_
 	kinc_g4_shader_init(shader, data, data_size, shader_type);
 }
 
-int kickstart(int argc, char** argv) {
+int kickstart(int argc, char **argv) {
 	kinc_init("Shader", 1024, 768, NULL, NULL);
 	kinc_set_update_callback(update);
 
-	heap = (uint8_t*)malloc(HEAP_SIZE);
+	heap = (uint8_t *)malloc(HEAP_SIZE);
 	assert(heap != NULL);
 
 	load_shader("shader.vert", &vertex_shader, KINC_G4_SHADER_TYPE_VERTEX);
@@ -72,16 +72,33 @@ int kickstart(int argc, char** argv) {
 	kinc_g4_pipeline_compile(&pipeline);
 
 	kinc_g4_vertex_buffer_init(&vertices, 3, &structure, KINC_G4_USAGE_STATIC, 0);
-	float *v = kinc_g4_vertex_buffer_lock_all(&vertices);
-	v[0] = -1; v[1] = -1; v[2] = 0.5;
-	v[3] = 1;  v[4] = -1; v[5] = 0.5;
-	v[6] = -1; v[7] = 1;  v[8] = 0.5;
-	kinc_g4_vertex_buffer_unlock_all(&vertices);
+	{
+		float *v = kinc_g4_vertex_buffer_lock_all(&vertices);
+		int i = 0;
+
+		v[i++] = -1;
+		v[i++] = -1;
+		v[i++] = 0.5;
+
+		v[i++] = 1;
+		v[i++] = -1;
+		v[i++] = 0.5;
+
+		v[i++] = -1;
+		v[i++] = 1;
+		v[i++] = 0.5;
+
+		kinc_g4_vertex_buffer_unlock_all(&vertices);
+	}
 
 	kinc_g4_index_buffer_init(&indices, 3);
-	int *i = kinc_g4_index_buffer_lock(&indices);
-	i[0] = 0; i[1] = 1; i[2] = 2;
-	kinc_g4_index_buffer_unlock(&indices);
+	{
+		int *i = kinc_g4_index_buffer_lock(&indices);
+		i[0] = 0;
+		i[1] = 1;
+		i[2] = 2;
+		kinc_g4_index_buffer_unlock(&indices);
+	}
 
 	kinc_start();
 
