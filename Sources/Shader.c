@@ -28,7 +28,7 @@ static void *allocate(size_t size) {
 	return &heap[old_top];
 }
 
-static void update() {
+static void update(void) {
 	kinc_g4_begin(0);
 	kinc_g4_clear(KINC_G4_CLEAR_COLOR, 0, 0.0f, 0);
 
