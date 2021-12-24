@@ -61,7 +61,7 @@ int kickstart(int argc, char **argv) {
 
 	kinc_g4_vertex_structure_t structure;
 	kinc_g4_vertex_structure_init(&structure);
-	kinc_g4_vertex_structure_add(&structure, "pos", KINC_G4_VERTEX_DATA_FLOAT3);
+	kinc_g4_vertex_structure_add(&structure, "pos", KINC_G4_VERTEX_DATA_F32_3X);
 	kinc_g4_pipeline_init(&pipeline);
 	pipeline.vertex_shader = &vertex_shader;
 	pipeline.fragment_shader = &fragment_shader;
@@ -89,9 +89,9 @@ int kickstart(int argc, char **argv) {
 		kinc_g4_vertex_buffer_unlock_all(&vertices);
 	}
 
-	kinc_g4_index_buffer_init(&indices, 3, KINC_G4_INDEX_BUFFER_FORMAT_32BIT, KINC_G4_USAGE_STATIC);
+	kinc_g4_index_buffer_init(&indices, 3, KINC_G4_INDEX_BUFFER_FORMAT_16BIT, KINC_G4_USAGE_STATIC);
 	{
-		int *i = kinc_g4_index_buffer_lock(&indices);
+		uint16_t *i = (uint16_t *)kinc_g4_index_buffer_lock(&indices);
 		i[0] = 0;
 		i[1] = 1;
 		i[2] = 2;
